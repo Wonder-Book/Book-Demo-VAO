@@ -26,14 +26,13 @@ let main = () => {
   let (vertices2, indices2) = Utils.createTriangleGeometryData();
   let (vertices3, indices3) = Utils.createTriangleGeometryData();
 
-  let (vertexBuffer1, indexBuffer1) =
-    Utils.initVertexBuffers((vertices1, indices1), gl);
+  let vaoExt = GPUDetect.unsafeGetVAOExt(gl);
 
-  let (vertexBuffer2, indexBuffer2) =
-    Utils.initVertexBuffers((vertices2, indices2), gl);
+  let vao1 = Utils.initVAO((vertices1, indices1), program1, vaoExt, gl);
 
-  let (vertexBuffer3, indexBuffer3) =
-    Utils.initVertexBuffers((vertices3, indices3), gl);
+  let vao2 = Utils.initVAO((vertices2, indices2), program2, vaoExt, gl);
+
+  let vao3 = Utils.initVAO((vertices3, indices3), program1, vaoExt, gl);
 
   let vMatrix =
     Matrix.createIdentityMatrix()
@@ -62,7 +61,7 @@ let main = () => {
 
     Gl.useProgram(program1, gl);
 
-    Utils.sendAttributeData(vertexBuffer1, program1, gl);
+    Utils.sendAttributeData(vao1, vaoExt);
 
     Utils.sendCameraUniformData((vMatrix, pMatrix), program1, gl);
 
@@ -75,8 +74,6 @@ let main = () => {
       gl,
     );
 
-    Gl.bindBuffer(Gl.getElementArrayBuffer(gl), indexBuffer1, gl);
-
     Gl.drawElements(
       Gl.getTriangles(gl),
       indices1 |> Js.Typed_array.Uint16Array.length,
@@ -86,7 +83,7 @@ let main = () => {
     );
     Gl.useProgram(program2, gl);
 
-    Utils.sendAttributeData(vertexBuffer2, program2, gl);
+    Utils.sendAttributeData(vao2, vaoExt);
 
     Utils.sendCameraUniformData((vMatrix, pMatrix), program2, gl);
 
@@ -101,8 +98,6 @@ let main = () => {
       gl,
     );
 
-    Gl.bindBuffer(Gl.getElementArrayBuffer(gl), indexBuffer2, gl);
-
     Gl.drawElements(
       Gl.getTriangles(gl),
       indices2 |> Js.Typed_array.Uint16Array.length,
@@ -113,7 +108,7 @@ let main = () => {
 
     Gl.useProgram(program1, gl);
 
-    Utils.sendAttributeData(vertexBuffer3, program1, gl);
+    Utils.sendAttributeData(vao3, vaoExt);
 
     Utils.sendCameraUniformData((vMatrix, pMatrix), program1, gl);
 
@@ -126,8 +121,6 @@ let main = () => {
       program1,
       gl,
     );
-
-    Gl.bindBuffer(Gl.getElementArrayBuffer(gl), indexBuffer3, gl);
 
     Gl.drawElements(
       Gl.getTriangles(gl),

@@ -12,6 +12,10 @@ type attributeLocation = int;
 
 type uniformLocation;
 
+type vao;
+
+type extension;
+
 type precisionFormat = {. "precision": int};
 
 type contextConfigJsObj = {
@@ -165,3 +169,11 @@ external getDepthBufferBit: webgl1Context => int = "DEPTH_BUFFER_BIT";
 [@bs.send.pipe: webgl1Context] external cullFace: int => unit = "";
 
 [@bs.get] external getBack: webgl1Context => int = "BACK";
+
+[@bs.send.pipe: webgl1Context] external createVertexArray: vao = "";
+
+[@bs.send.pipe: webgl1Context]
+external bindVertexArray: Js.Null.t(vao) => unit = "";
+
+[@bs.send.pipe: webgl1Context]
+external getExtension: string => Js.Nullable.t(extension) = "";

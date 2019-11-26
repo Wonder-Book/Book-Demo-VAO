@@ -1,5 +1,7 @@
 let error = msg => Js.Exn.raiseError(msg) |> ignore;
 
+let errorAndReturn = msg => Js.Exn.raiseError(msg);
+
 let createTriangleGeometryData = () => {
   open Js.Typed_array;
 
@@ -115,17 +117,40 @@ let initShader = (vsSource: string, fsSource: string, gl, program) => {
   program;
 };
 
-let initVertexBuffers = ((vertices, indices), gl) => {
-  let vertexBuffer = Gl.createBuffer(gl);
+let initVAO = ((vertices, indices), program, vaoExt, gl) => {
+  let vao = vaoExt##createVertexArrayOES();
 
-  Gl.bindBuffer(Gl.getArrayBuffer(gl), vertexBuffer, gl);
+  vaoExt##bindVertexArrayOES(. Js.Nullable.return(vao));
 
-  Gl.bufferFloat32Data(
-    Gl.getArrayBuffer(gl),
-    vertices,
-    Gl.getStaticDraw(gl),
-    gl,
-  );
+  let positionLocation = Gl.getAttribLocation(program, "a_position", gl);
+
+  positionLocation === (-1) ?
+    error({j|Failed to get the storage location of a_position|j}) :
+    {
+      let vertexBuffer = Gl.createBuffer(gl);
+
+      Gl.bindBuffer(Gl.getArrayBuffer(gl), vertexBuffer, gl);
+
+      Gl.bufferFloat32Data(
+        Gl.getArrayBuffer(gl),
+        vertices,
+        Gl.getStaticDraw(gl),
+        gl,
+      );
+
+      Gl.bindBuffer(Gl.getArrayBuffer(gl), vertexBuffer, gl);
+
+      Gl.vertexAttribPointer(
+        positionLocation,
+        3,
+        Gl.getFloat(gl),
+        false,
+        0,
+        0,
+        gl,
+      );
+      Gl.enableVertexAttribArray(positionLocation, gl);
+    };
 
   let indexBuffer = Gl.createBuffer(gl);
 
@@ -138,28 +163,13 @@ let initVertexBuffers = ((vertices, indices), gl) => {
     gl,
   );
 
-  (vertexBuffer, indexBuffer);
+  vaoExt##bindVertexArrayOES(. Js.Nullable.null);
+
+  vao;
 };
 
-let sendAttributeData = (vertexBuffer, program, gl) => {
-  let positionLocation = Gl.getAttribLocation(program, "a_position", gl);
-
-  positionLocation === (-1) ?
-    error({j|Failed to get the storage location of a_position|j}) : ();
-
-  Gl.bindBuffer(Gl.getArrayBuffer(gl), vertexBuffer, gl);
-
-  Gl.vertexAttribPointer(
-    positionLocation,
-    3,
-    Gl.getFloat(gl),
-    false,
-    0,
-    0,
-    gl,
-  );
-  Gl.enableVertexAttribArray(positionLocation, gl);
-};
+let sendAttributeData = (vao, vaoExt) =>
+  vaoExt##bindVertexArrayOES(. Js.Nullable.return(vao));
 
 let sendCameraUniformData = ((vMatrix, pMatrix), program, gl) => {
   let vMatrixLocation = Gl.getUniformLocation(program, "u_vMatrix", gl);
