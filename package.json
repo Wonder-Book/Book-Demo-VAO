@@ -1,0 +1,14 @@
+{
+    "name": "tiny-wonder-demo-vao",
+    "version": "0.0.1",
+    "authors": "yyc",
+    "license": "mit",
+    "scripts": {
+        "bsb:watch": "bsb -clean-world -make-world -w",
+        "bsb:build": "bsb -clean-world -make-world"
+    },
+    "devDependencies": {
+        "bs-platform": "^5.2.0"
+    },
+    "dependencies": {}
+}
